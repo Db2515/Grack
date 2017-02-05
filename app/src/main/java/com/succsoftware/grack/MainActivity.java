@@ -22,7 +22,7 @@ public class MainActivity extends Activity implements
 {
 
     private static final String CLIENT_ID = "4b93839fe92543e6ac2b291ff440d17f";
-    private static final String REDIRECT_URI = "http://localhost:1234/callback";
+    private static final String REDIRECT_URI = "grack://callback";
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
