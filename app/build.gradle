@@ -31,10 +31,10 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    testCompile 'junit:junit:4.12'
     // This library handles authentication and authorisation
-    compile 'com.spotify.sdk:spotify-auth:1.0.0-beta13@aar'
     // This library handles music playback
-    compile 'com.spotify.sdk:spotify-player:1.0.0-beta13@aar'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.spotify.sdk:spotify-auth:1.0.0-beta12@aar'
+    compile 'com.spotify.sdk:spotify-player-24-noconnect:2.20b@aar'
+    testCompile 'junit:junit:4.12'
 }
