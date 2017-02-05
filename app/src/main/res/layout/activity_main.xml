@@ -12,13 +12,12 @@
         android:layout_width="wrap_content"
         android:layout_height="277dp"
         android:layout_weight="0.70" />
-    <!--
+
     <ImageView
+        android:id="@+id/albumview"
         android:layout_width="wrap_content"
         android:layout_height="277dp"
-        android:src="@drawable/succ"
-        android:layout_weight="1.20" />
-    -->
+        android:layout_weight="1.20"/>
 
 
     <EditText android:id="@+id/search_bar"
@@ -53,7 +52,8 @@
 
     <Button android:id="@+id/button4"
         android:layout_gravity="bottom"
-        android:text="Next song >>>"/>
+        android:text="Next song >>>"
+        android:onClick="nextSong"/>
     <!-- More GUI components go here  -->
 
 </TableLayout>

@@ -2,7 +2,10 @@ package com.succsoftware.grack;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.support.v7.app.AppCompatActivity;
@@ -24,9 +27,13 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import junit.framework.Assert;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.*;
 
 public class MainActivity extends Activity implements
@@ -99,28 +106,6 @@ public class MainActivity extends Activity implements
     @Override
     public void onPlaybackEvent(PlayerEvent playerEvent) {
         Log.d("MainActivity", "Playback event received: " + playerEvent.name());
-        /*
-        if(playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged && !queue.isEmpty()){
-            mPlayer.pause(null);
-            myWebView.destroy();
-            current = queue.remove(0);
-            current.updateDetails();
-            switch (current.getType()){
-                case 0:
-                    break;
-                case 1:
-                    String domain = current.getDomain();
-                    mPlayer.playUri(null, domain,0,0);
-                    break;
-                case 2:
-                    myWebView = (WebView) findViewById(R.id.webview);
-                    myWebView.setWebViewClient(myWebViewClient);
-                    WebSettings webSettings = myWebView.getSettings();
-                    webSettings.setJavaScriptEnabled(true);
-                    myWebView.loadUrl(current.getDomain());
-                break;
-            }
-        }*/
     }
 
     @Override
@@ -184,19 +169,21 @@ public class MainActivity extends Activity implements
 
     }
 
-    @Override
-    public void onBackPressed() {
+    public void nextSong(View view) {
         setContentView(R.layout.activity_main);
         mPlayer.pause(null);
         myWebView.destroy();
         if (!queue.isEmpty()) {
             current = queue.remove(0);
             current.updateDetails();
+            ImageView albumView = (ImageView) findViewById(R.id.albumview);
             switch (current.getType()) {
                 case 0:
                     break;
                 case 1:
                     mPlayer.playUri(null, current.getDomain(), 0, 0);
+                    String albumnart = mPlayer.getMetadata().currentTrack.albumCoverWebUrl;
+                    new DownLoadImageTask(albumView).execute(albumnart);
                     break;
                 case 2:
                     myWebView = (WebView) findViewById(R.id.webview);
@@ -224,6 +211,42 @@ public class MainActivity extends Activity implements
         String searchTermSoundcloud = editText.getText().toString();
         intent.putExtra(EXTRA_MESSAGE, searchTermSoundcloud);
         startActivity(intent);
+    }
+
+    private class DownLoadImageTask extends AsyncTask<String,Void,Bitmap> {
+        ImageView imageView;
+
+        public DownLoadImageTask(ImageView imageView){
+            this.imageView = imageView;
+        }
+
+        /*
+            doInBackground(Params... params)
+                Override this method to perform a computation on a background thread.
+         */
+        protected Bitmap doInBackground(String...urls){
+            String urlOfImage = urls[0];
+            Bitmap logo = null;
+            try{
+                InputStream is = new URL(urlOfImage).openStream();
+                /*
+                    decodeStream(InputStream is)
+                        Decode an input stream into a bitmap.
+                 */
+                logo = BitmapFactory.decodeStream(is);
+            }catch(Exception e){ // Catch the download exception
+                e.printStackTrace();
+            }
+            return logo;
+        }
+
+        /*
+            onPostExecute(Result result)
+                Runs on the UI thread after doInBackground(Params...).
+         */
+        protected void onPostExecute(Bitmap result){
+            imageView.setImageBitmap(result);
+        }
     }
 }
 
