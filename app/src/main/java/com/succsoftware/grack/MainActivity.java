@@ -16,6 +16,11 @@ import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
+import java.util.*;
 
 public class MainActivity extends Activity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
@@ -30,10 +35,19 @@ public class MainActivity extends Activity implements
 
     private Player mPlayer;
 
+
+
+    ArrayList<Song> queue = new ArrayList<Song>();
+    Song current;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        WebView myWebView = (WebView) findViewById(R.id.webview);
+        myWebView.setWebViewClient(new WebViewClient());
+        WebSettings webSettings = myWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
                 AuthenticationResponse.Type.TOKEN,
@@ -119,5 +133,50 @@ public class MainActivity extends Activity implements
     @Override
     public void onConnectionMessage(String message) {
         Log.d("MainActivity", "Received connection message: " + message);
+        WebView myWebView = (WebView) findViewById(R.id.webview);
+        myWebView.setWebViewClient(new WebViewClient());
+        WebSettings webSettings = myWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
+        queue.add(new Song("https://soundcloud.com/majorleaguewobs/filthy-frank-theme"));
+        queue.add(new Song("spotify:track:2TpxZ7JUBn3uw46aR7qd6V"));
+        queue.add(new Song("https://soundcloud.com/rlgrime/tell-me-rl-grime-what-so-not"));
+        queue.add(new Song("https://soundcloud.com/chancetherapper/no-problem-feat-lil-wayne-2-chainz"));
+        current = queue.remove(0);
+        current.getDetails();
+        switch (current.getType()){
+            case 0:
+                break;
+            case 1:
+                mPlayer.playUri(null, current.getDomain(),0,0);
+                break;
+            case 2:
+                myWebView.loadUrl(current.getDomain());
+                break;
+        }
+
     }
+
+    @Override
+    public void onBackPressed() {
+        setContentView(R.layout.activity_main);
+        WebView myWebView = (WebView) findViewById(R.id.webview);
+        myWebView.setWebViewClient(new WebViewClient());
+        WebSettings webSettings = myWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        current = queue.remove(0);
+        current.getDetails();
+        switch (current.getType()){
+            case 0:
+                break;
+            case 1:
+                mPlayer.playUri(null, current.getDomain(),0,0);
+                break;
+            case 2:
+                myWebView.loadUrl(current.getDomain());
+                break;
+        }
+    }
+
+
 }
