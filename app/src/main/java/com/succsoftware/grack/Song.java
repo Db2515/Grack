@@ -14,7 +14,7 @@ public class Song {
         this.domain = domain;
     }
 
-    public void getDetails(){
+    public void updateDetails(){
         if(domain.toLowerCase().contains("spotify")){
             type = 1;
 

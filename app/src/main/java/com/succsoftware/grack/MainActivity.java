@@ -20,6 +20,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import junit.framework.Assert;
+
 import java.util.*;
 
 public class MainActivity extends Activity implements
@@ -35,27 +37,25 @@ public class MainActivity extends Activity implements
 
     private Player mPlayer;
 
+    private WebView myWebView;
+    private WebViewClient myWebViewClient = new WebViewClient();
 
-
-    ArrayList<Song> queue = new ArrayList<Song>();
+    ArrayList<Song> queue = new ArrayList<>();
     Song current;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        WebView myWebView = (WebView) findViewById(R.id.webview);
-        myWebView.setWebViewClient(new WebViewClient());
-        WebSettings webSettings = myWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
-                AuthenticationResponse.Type.TOKEN,
-                REDIRECT_URI);
+                                                                AuthenticationResponse.Type.TOKEN,
+                                                                REDIRECT_URI);
         builder.setScopes(new String[]{"user-read-private", "streaming"});
         AuthenticationRequest request = builder.build();
 
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
+
+
     }
 
     @Override
@@ -93,11 +93,28 @@ public class MainActivity extends Activity implements
     @Override
     public void onPlaybackEvent(PlayerEvent playerEvent) {
         Log.d("MainActivity", "Playback event received: " + playerEvent.name());
-        switch (playerEvent) {
-            // Handle event type as necessary
-            default:
+        /*
+        if(playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged && !queue.isEmpty()){
+            mPlayer.pause(null);
+            myWebView.destroy();
+            current = queue.remove(0);
+            current.updateDetails();
+            switch (current.getType()){
+                case 0:
+                    break;
+                case 1:
+                    String domain = current.getDomain();
+                    mPlayer.playUri(null, domain,0,0);
+                    break;
+                case 2:
+                    myWebView = (WebView) findViewById(R.id.webview);
+                    myWebView.setWebViewClient(myWebViewClient);
+                    WebSettings webSettings = myWebView.getSettings();
+                    webSettings.setJavaScriptEnabled(true);
+                    myWebView.loadUrl(current.getDomain());
                 break;
-        }
+            }
+        }*/
     }
 
     @Override
@@ -113,6 +130,31 @@ public class MainActivity extends Activity implements
     @Override
     public void onLoggedIn() {
         Log.d("MainActivity", "User logged in");
+        myWebView = (WebView) findViewById(R.id.webview);
+        myWebView.setWebViewClient(myWebViewClient);
+        WebSettings webSettings = myWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
+        queue.add(new Song("spotify:track:4DGRyGjqrVYl7b0TMMnjUc"));
+        queue.add(new Song("spotify:track:2TpxZ7JUBn3uw46aR7qd6V"));
+        queue.add(new Song("https://soundcloud.com/majorleaguewobs/filthy-frank-theme"));
+        queue.add(new Song("https://soundcloud.com/rlgrime/tell-me-rl-grime-what-so-not"));
+        queue.add(new Song("spotify:track:7riu93M5VsO7kQdMuDwaIX"));
+        queue.add(new Song("https://soundcloud.com/chancetherapper/no-problem-feat-lil-wayne-2-chainz"));
+        current = queue.remove(0);
+        current.updateDetails();
+        switch (current.getType()){
+            case 0:
+                break;
+            case 1:
+                String domain = current.getDomain();
+                mPlayer.playUri(null, domain,0,0);
+                break;
+            case 2:
+                myWebView.loadUrl(current.getDomain());
+                break;
+        }
+
     }
 
     @Override
@@ -133,50 +175,32 @@ public class MainActivity extends Activity implements
     @Override
     public void onConnectionMessage(String message) {
         Log.d("MainActivity", "Received connection message: " + message);
-        WebView myWebView = (WebView) findViewById(R.id.webview);
-        myWebView.setWebViewClient(new WebViewClient());
-        WebSettings webSettings = myWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-
-        queue.add(new Song("https://soundcloud.com/majorleaguewobs/filthy-frank-theme"));
-        queue.add(new Song("spotify:track:2TpxZ7JUBn3uw46aR7qd6V"));
-        queue.add(new Song("https://soundcloud.com/rlgrime/tell-me-rl-grime-what-so-not"));
-        queue.add(new Song("https://soundcloud.com/chancetherapper/no-problem-feat-lil-wayne-2-chainz"));
-        current = queue.remove(0);
-        current.getDetails();
-        switch (current.getType()){
-            case 0:
-                break;
-            case 1:
-                mPlayer.playUri(null, current.getDomain(),0,0);
-                break;
-            case 2:
-                myWebView.loadUrl(current.getDomain());
-                break;
-        }
 
     }
 
     @Override
     public void onBackPressed() {
         setContentView(R.layout.activity_main);
-        WebView myWebView = (WebView) findViewById(R.id.webview);
-        myWebView.setWebViewClient(new WebViewClient());
-        WebSettings webSettings = myWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        current = queue.remove(0);
-        current.getDetails();
-        switch (current.getType()){
-            case 0:
-                break;
-            case 1:
-                mPlayer.playUri(null, current.getDomain(),0,0);
-                break;
-            case 2:
-                myWebView.loadUrl(current.getDomain());
-                break;
+        mPlayer.pause(null);
+        myWebView.destroy();
+        if(!queue.isEmpty()) {
+            current = queue.remove(0);
+            current.updateDetails();
+            switch (current.getType()) {
+                case 0:
+                    break;
+                case 1:
+                    mPlayer.playUri(null, current.getDomain(), 0, 0);
+                    break;
+                case 2:
+                    myWebView = (WebView) findViewById(R.id.webview);
+                    myWebView.setWebViewClient(myWebViewClient);
+                    WebSettings webSettings = myWebView.getSettings();
+                    webSettings.setJavaScriptEnabled(true);
+                    myWebView.loadUrl(current.getDomain());
+                    break;
+            }
         }
     }
-
 
 }
