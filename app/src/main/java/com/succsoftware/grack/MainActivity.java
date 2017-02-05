@@ -47,27 +47,24 @@ public class MainActivity extends Activity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        Uri uri = intent.getData();
-        if(uri != null) {
-            // Check if result comes from the correct activity
-            if (requestCode == REQUEST_CODE) {
-                AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
-                if (response.getType() == AuthenticationResponse.Type.TOKEN) {
-                    Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
-                    Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
-                        @Override
-                        public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                            mPlayer = spotifyPlayer;
-                            mPlayer.addConnectionStateCallback(MainActivity.this);
-                            mPlayer.addNotificationCallback(MainActivity.this);
-                        }
+        // Check if result comes from the correct activity
+        if (requestCode == REQUEST_CODE) {
+            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
+            if (response.getType() == AuthenticationResponse.Type.TOKEN) {
+                Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
+                Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+                    @Override
+                    public void onInitialized(SpotifyPlayer spotifyPlayer) {
+                        mPlayer = spotifyPlayer;
+                        mPlayer.addConnectionStateCallback(MainActivity.this);
+                        mPlayer.addNotificationCallback(MainActivity.this);
+                    }
 
-                        @Override
-                        public void onError(Throwable throwable) {
-                            Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
-                        }
-                    });
-                }
+                    @Override
+                    public void onError(Throwable throwable) {
+                        Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
+                    }
+                });
             }
         }
     }
@@ -102,8 +99,6 @@ public class MainActivity extends Activity implements
     @Override
     public void onLoggedIn() {
         Log.d("MainActivity", "User logged in");
-
-        mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
     }
 
     @Override
@@ -124,11 +119,5 @@ public class MainActivity extends Activity implements
     @Override
     public void onConnectionMessage(String message) {
         Log.d("MainActivity", "Received connection message: " + message);
-    }
-
-    @Override
-    public void onNewIntent(Intent intent){
-        super.onNewIntent(intent);
-        setIntent(intent);
     }
 }

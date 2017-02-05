@@ -34,7 +34,7 @@ dependencies {
     // This library handles authentication and authorisation
     // This library handles music playback
     compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.spotify.sdk:spotify-auth:1.0.0-beta12@aar'
+    compile 'com.spotify.sdk:spotify-android-auth:1.0.0@aar'
     compile 'com.spotify.sdk:spotify-player-24-noconnect:2.20b@aar'
     testCompile 'junit:junit:4.12'
 }
