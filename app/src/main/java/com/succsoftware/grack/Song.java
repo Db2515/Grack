@@ -17,6 +17,7 @@ public class Song {
     public void getDetails(){
         if(domain.toLowerCase().contains("spotify")){
             type = 1;
+
         }
         else if(domain.toLowerCase().contains("soundcloud")){
             type = 2;
