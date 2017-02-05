@@ -5,6 +5,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import com.succsoftware.grack.R;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -25,8 +30,7 @@ import junit.framework.Assert;
 import java.util.*;
 
 public class MainActivity extends Activity implements
-        SpotifyPlayer.NotificationCallback, ConnectionStateCallback
-{
+        SpotifyPlayer.NotificationCallback, ConnectionStateCallback {
 
     private static final String CLIENT_ID = "4b93839fe92543e6ac2b291ff440d17f";
     private static final String REDIRECT_URI = "grack://callback";
@@ -42,14 +46,16 @@ public class MainActivity extends Activity implements
 
     ArrayList<Song> queue = new ArrayList<>();
     Song current;
+    public static final String EXTRA_MESSAGE = "com.succsoftware.grack.MESSAGE";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
-                                                                AuthenticationResponse.Type.TOKEN,
-                                                                REDIRECT_URI);
+                AuthenticationResponse.Type.TOKEN,
+                REDIRECT_URI);
         builder.setScopes(new String[]{"user-read-private", "streaming"});
         AuthenticationRequest request = builder.build();
 
@@ -143,12 +149,12 @@ public class MainActivity extends Activity implements
         queue.add(new Song("https://soundcloud.com/chancetherapper/no-problem-feat-lil-wayne-2-chainz"));
         current = queue.remove(0);
         current.updateDetails();
-        switch (current.getType()){
+        switch (current.getType()) {
             case 0:
                 break;
             case 1:
                 String domain = current.getDomain();
-                mPlayer.playUri(null, domain,0,0);
+                mPlayer.playUri(null, domain, 0, 0);
                 break;
             case 2:
                 myWebView.loadUrl(current.getDomain());
@@ -183,7 +189,7 @@ public class MainActivity extends Activity implements
         setContentView(R.layout.activity_main);
         mPlayer.pause(null);
         myWebView.destroy();
-        if(!queue.isEmpty()) {
+        if (!queue.isEmpty()) {
             current = queue.remove(0);
             current.updateDetails();
             switch (current.getType()) {
@@ -203,4 +209,21 @@ public class MainActivity extends Activity implements
         }
     }
 
+    public void searchSpotify(View view) {
+        Intent intent = new Intent(this, searchSpotify.class);
+        EditText editText = (EditText) findViewById(R.id.search_bar);
+        String searchTermSpotify = editText.getText().toString();
+        intent.putExtra(EXTRA_MESSAGE, searchTermSpotify);
+        startActivity(intent);
+
+    }
+
+    public void searchSoundcloud(View view) {
+        Intent intent = new Intent(this, searchSoundcloud.class);
+        EditText editText = (EditText) findViewById(R.id.search_bar);
+        String searchTermSoundcloud = editText.getText().toString();
+        intent.putExtra(EXTRA_MESSAGE, searchTermSoundcloud);
+        startActivity(intent);
+    }
 }
+
